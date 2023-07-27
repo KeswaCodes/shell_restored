@@ -1,3 +1,4 @@
+
 #ifndef MAIN_H
 #define MAIN_H
 #include <unistd.h>
@@ -14,5 +15,5 @@ char *_getenv(const char *name);
 void print_prompt(void);
 char *read_input(void);
 char **tokenize_args(char *lineptr);
-
+char *handle_path(char *lineptr);
 #endif

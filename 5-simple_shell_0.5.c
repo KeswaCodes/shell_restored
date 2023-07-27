@@ -1,12 +1,14 @@
 #include "main.h"
-/*function tokenizes arguments*/
+/* function tokenizes arguments */
 char **tokenize_args(char *lineptr);
 
-/*function prints a prompt*/
+/* function prints a prompt*/
 void print_prompt(void);
 
 /*function reads input*/
 char *read_input(void);
+/*handles the path of a command*/
+char *handle_path(char *lineptr);
 
 /**
  *main- simple shell by zinksw@gmail.com
@@ -16,8 +18,8 @@ char *read_input(void);
  */
 int main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 {
-int i, status, process, interactive;
-char *lineptr = NULL, **env_var = environ, **args;
+int i, status, process, interactive, m;
+char *lineptr = NULL, **env_var = environ, **args, *path;
 
 for (i = 0; ; i++)
 {
@@ -33,15 +35,31 @@ continue;
 args = tokenize_args(lineptr);
 if (args == NULL)
 continue;
+for (m = 0; lineptr[m] != '\0'; m++)
+{
+if (lineptr[m] == '/')
+{
+path = lineptr;
+break;
+}
+else
+{
+path = handle_path(lineptr);
+break;
+}
+}
 
+if (path != NULL)
 process = fork();
+else
+exit(EXIT_FAILURE);
+
 if (process == 0)
 {
-if (execve(args[0], args, env_var) == -1)
-perror("./hsh ");
 
+execve(path, args, env_var);
 if (interactive == 0)
-perror("./hsh ");
+perror("./hsh");
 free(args);
 exit(EXIT_FAILURE);
 }
@@ -61,9 +79,9 @@ return (0);
  */
 void print_prompt(void)
 {
-char *data = "$ ";
+char *data = ":)# ";
 
-write(1, data, 3);
+write(1, data, 5);
 }
 /**
  *read_input- reads input from stdin
@@ -74,7 +92,7 @@ char *read_input(void)
 char *lineptr = NULL;
 size_t n = 0, i = 0;
 ssize_t input;
-
+int m, k;
 
 input = getline(&lineptr, &n, stdin);
 
@@ -92,7 +110,18 @@ if (lineptr != NULL)
 if (lineptr[input - 1] == '\n')
 lineptr[input - 1] = '\0';
 }
-
+for (k = 0; lineptr[k] != '\0'; k++)
+{
+if (lineptr[k] == 'e' && lineptr[k + 1] == 'n' && lineptr[k + 2] == 'v')
+print_env();
+}
+for (m = 0; m < 4; m++)
+{
+if (lineptr[m] != "exit"[m])
+break;
+}
+if (m == 4)
+exit(EXIT_SUCCESS);
 
 return (lineptr);
 }
@@ -121,14 +150,60 @@ if (args == NULL)
 return (NULL);
 
 /*tokenize arguments*/
-tokens = strtok(lineptr, "");
+tokens = strtok(lineptr, " ");
 while (tokens != NULL)
 {
 args[j] = tokens;
-tokens = strtok(NULL, "");
+tokens = strtok(NULL, " ");
 j++;
 }
 args[j] = NULL;
 
 return (args);
+}
+
+
+/**
+ *handle_path- handles the command line with arguments
+ *@lineptr: command line string
+ *Return: pointer to path matching input
+ */
+
+char *handle_path(char *lineptr)
+{
+
+char *path, *tokens, *path_token;
+char *command = lineptr;
+int i = 0, m;
+
+path = _getenv("PATH");
+if (path == NULL)
+return (NULL);
+
+tokens = strtok(path, ":");
+while (tokens != NULL)
+{
+for (i = 0; tokens[i] != '\0'; i++)
+;
+
+path_token = malloc(sizeof(char) * (i + 2));
+if (path_token == NULL)
+return (NULL);
+for (i = 0; tokens[i] != '\0'; i++)
+path_token[i] = tokens[i];
+
+path_token[i] = '/';
+i++;
+for (m = 0; command[m] != ' ' && command[m] != '\0'; m++)
+path_token[i + m] = command[m];
+
+path_token[i + m] = '\0';
+if (access(path_token, X_OK) == 0)
+return (path_token);
+
+tokens = strtok(NULL, ":");
+}
+
+
+return (path_token);
 }

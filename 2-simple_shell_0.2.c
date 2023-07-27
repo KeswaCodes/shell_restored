@@ -1,8 +1,8 @@
 #include "main.h"
-/*function tokenizes arguments*/
+/* function tokenizes arguments */
 char **tokenize_args(char *lineptr);
 
-/*function prints a prompt*/
+/* function prints a prompt*/
 void print_prompt(void);
 
 /*function reads input*/
@@ -37,11 +37,9 @@ continue;
 process = fork();
 if (process == 0)
 {
-if (execve(args[0], args, env_var) == -1)
-perror("./hsh ");
-
+execve(args[0], args, env_var);
 if (interactive == 0)
-perror("./hsh ");
+perror("./hsh");
 free(args);
 exit(EXIT_FAILURE);
 }
@@ -61,9 +59,9 @@ return (0);
  */
 void print_prompt(void)
 {
-char *data = "$ ";
+char *data = ":)# ";
 
-write(1, data, 3);
+write(1, data, 5);
 }
 /**
  *read_input- reads input from stdin
@@ -93,7 +91,6 @@ if (lineptr[input - 1] == '\n')
 lineptr[input - 1] = '\0';
 }
 
-
 return (lineptr);
 }
 
@@ -121,14 +118,15 @@ if (args == NULL)
 return (NULL);
 
 /*tokenize arguments*/
-tokens = strtok(lineptr, "");
+tokens = strtok(lineptr, " ");
 while (tokens != NULL)
 {
 args[j] = tokens;
-tokens = strtok(NULL, "");
+tokens = strtok(NULL, " ");
 j++;
 }
 args[j] = NULL;
 
 return (args);
 }
+
