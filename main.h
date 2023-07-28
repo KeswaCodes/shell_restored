@@ -13,7 +13,7 @@ int print_env(void);
 int _putchar(char c);
 char *_getenv(const char *name);
 void print_prompt(void);
-char *read_input(void);
-char **tokenize_args(char *lineptr);
 char *handle_path(char *lineptr);
+char *read_input(ssize_t input, char *lineptr);
+char **tokenize_args(char *lineptr, char **args);
 #endif
