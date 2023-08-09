@@ -4,46 +4,26 @@
  *Return: 1 (success), -1 otherwise
  */
 
-int main(void)
+int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)), char **env)
 {
-  pid_t pid;
-  int status, i;
-  ssize_t input;
-  char *lineptr = NULL;
-  size_t n = 0;
+char *lineptr = NULL;
+int i = 0;  
+  
+while(1)
+{
+if (isatty(STDIN_FILENO) == 1)
+printf(":)# ");
 
-  for (i = 0; ; i++)
-	{
+get_user_input(&lineptr);
+if (*lineptr == '\n')
+continue;
 
-	  if (isatty(STDIN_FILENO) == 1)
-	  printf("$ ");
 
-	  pid = fork();
-	  if (pid > 0)
-	    {
-	      waitpid(pid, &status, 0);
-	  break;
-	    }
-	  else if (pid == 0)
-	    {
-	   input = getline(&lineptr, &n, stdin);
-	   if (input == -1)
-	     {
-	      free(lineptr);
-	      printf("\n");
-	   exit(EXIT_SUCCESS);
-	     }
+process(&lineptr, env);
 
-	   else if (input == 1)
-	     continue;
-	   else
-	     printf("%s\n", lineptr);
-	   
-	    }
-	  
-
-	}
+i = 0;
+}
     
-  free(lineptr);
-  return (0);
+free(lineptr);
+return (0);
 }
