@@ -27,7 +27,6 @@ lineptr = read_input(input, line_read);
 if (lineptr == NULL)
 continue;
 
-args = malloc(n + 1);
 args_tok = tokenize_args(lineptr, args);
 
 if (args == NULL)
@@ -112,19 +111,15 @@ return (lineptr);
 char **tokenize_args(char *lineptr, char **args)
 {
 char *tokens;
-int j = 0, i = 0, k = 0;
-
+int j = 0, k = 0;
+size_t i;
 if (lineptr == NULL)
 return (NULL);
 
-if (args == NULL)
-return (NULL);
 while (lineptr[i] != '\0')
 i++;
 
 i += 1;
-if (args == NULL)
-return (NULL);
 
 /*tokenize arguments*/
 tokens = strtok(lineptr, "");
